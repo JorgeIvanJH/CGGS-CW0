@@ -2,12 +2,7 @@
 #include "../../external/eigen/Eigen/Dense"
 #include <iostream>
  
-using Eigen::MatrixXd;
-using Eigen::Matrix3d;
-using Eigen::Vector3d;
-using Eigen::FullPivLU;
-
-
+using namespace Eigen;
 using namespace std;
 
 int main()
