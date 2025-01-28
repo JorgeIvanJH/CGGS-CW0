@@ -16,7 +16,8 @@ MatrixXd V;
 
 int main()
 {
-    readOFF(DATA_PATH "/kitten.off",V, F);
+    cout << "OK" << endl;
+    readOFF(DATA_PATH "/Kitten.off",V, F);
     polyscope::init();
     SurfaceMesh* pSurfaceMesh = polyscope::registerSurfaceMesh("mesh", V, F);
     VectorXd areas;

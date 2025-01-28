@@ -26,12 +26,12 @@ int main()
   for (const auto& entry : fs::directory_iterator(folderPath)) {
     if (entry.is_regular_file() && entry.path().extension() == ".off") {
       cout<<"Working on file "<<entry.path().filename()<<endl;
-      std::string dataName = entry.path();
+      std::string dataName = entry.path().string();
       dataName.erase(dataName.size() - 4, 4);
       std::ifstream ifs(dataName+"-section21.data", std::ofstream::binary);
       MatrixXd normalsGT;
       VectorXd areasGT;
-      readOFF(entry.path(), V, F);
+      readOFF(entry.path().string(), V, F);
       compute_areas_normals(V, F, areas, normals);
       deserializeVector(areasGT, ifs);
       deserializeMatrix(normalsGT, ifs);
