@@ -26,6 +26,7 @@ VectorXi boundEMask;
 
 int main()
 {
+	cout << "BEGIN - Bunny" << endl;
     readOFF(DATA_PATH "/Bunny.off",V, F);
     polyscope::init();
     polyscope::SurfaceMesh* pSurf = polyscope::registerSurfaceMesh("mesh", V, F);

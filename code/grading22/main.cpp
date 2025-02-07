@@ -25,12 +25,12 @@ int main()
   for (const auto& entry : fs::directory_iterator(folderPath)) {
     if (entry.is_regular_file() && entry.path().extension() == ".off") {
       cout<<"Working on file "<<entry.path().filename()<<endl;
-      std::string dataName = entry.path();
+      std::string dataName = entry.path().string();
       dataName.erase(dataName.size() - 4, 4);
       std::ifstream ifs(dataName+"-section22.data", std::ofstream::binary);
       MatrixXi HGT, EGT;
       VectorXi boundEMaskGT;
-      readOFF(entry.path(), V, F);
+      readOFF(entry.path().string(), V, F);
       create_edge_list(F,H, E, boundEMask);
       deserializeMatrix(HGT, ifs);
       deserializeMatrix(EGT, ifs);
