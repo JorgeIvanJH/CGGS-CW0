@@ -6,19 +6,21 @@
 #include "set_diff.h"
 #include "slice_columns_sparse.h"
 
-// Helper function to construct the differential matrix d0
+// Construct the differential matrix d0
 Eigen::SparseMatrix<double> construct_d0(const Eigen::MatrixXi &E, int numVertices)
 {
-  std::vector<Eigen::Triplet<double>> triplets; // triples to construct the sparse matrix
+  std::vector<Eigen::Triplet<double>> tripletList; // triples to construct the sparse matrix
+  tripletList.reserve(2 * E.rows()); // Reserve space for the triplets
   for (int i = 0; i < E.rows(); ++i)
   {
     int source = E(i, 0);                   // Source vertex
     int target = E(i, 1);                   // Target vertex
-    triplets.emplace_back(i, source, -1.0); // d0(i, source) = -1
-    triplets.emplace_back(i, target, 1.0);  // d0(i, target) = 1
+    tripletList.emplace_back(i, source, -1.0); // d0(i, source) = -1
+    // Set the values of each triplet (row, column, value) → COOrdinate format
+    tripletList.emplace_back(i, target, 1.0);  // d0(i, target) = 1
   }
-  Eigen::SparseMatrix<double> d0(E.rows(), numVertices);
-  d0.setFromTriplets(triplets.begin(), triplets.end());
+  Eigen::SparseMatrix<double> d0(E.rows(), numVertices); 
+  d0.setFromTriplets(tripletList.begin(), tripletList.end()); // Fill the matrix with the tripletList defined by the iterator range begin - end.
   return d0;
 }
 
@@ -29,25 +31,25 @@ Eigen::VectorXd harmonic_interpolation(const Eigen::MatrixXd &V,
 {
   int numVertices = V.rows();
 
-  // Step 1: Compute I (complement of B)
+  // Compute I (complement of B) -> Indices of the vertices that are not fixed
   Eigen::VectorXi I = set_diff(Eigen::VectorXi::LinSpaced(numVertices, 0, numVertices - 1), B);
 
-  // Step 2: Construct the differential matrix d0
+  // Construct the differential matrix d0
   Eigen::SparseMatrix<double> d0 = construct_d0(E, numVertices);
 
-  // Step 3: Slice d0 into d0|I and d0|B
+  // Slice d0 to get d0|I and d0|B
   Eigen::SparseMatrix<double> d0I = slice_columns_sparse(d0, I);
   Eigen::SparseMatrix<double> d0B = slice_columns_sparse(d0, B);
 
-  // Step 4: Compute the RHS of the equation
-  Eigen::VectorXd rhs = -d0I.transpose() * (d0B * xB);
+  // Compute the RHS of the equation
+  Eigen::VectorXd rhs = -d0I.transpose() * d0B * xB;
 
-  // Step 5: Solve the system (d0I^T * d0I) * xI = rhs
+  // Solve the system (d0I^T * d0I) * xI = rhs
   Eigen::SparseMatrix<double> A = d0I.transpose() * d0I;
   Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> solver(A);
   Eigen::VectorXd xI = solver.solve(rhs);
 
-  // Step 6: Combine xB and xI into the final result x
+  // Combine xB and xI into the final result x
   Eigen::VectorXd x(numVertices);
   for (int i = 0; i < B.size(); ++i)
   {

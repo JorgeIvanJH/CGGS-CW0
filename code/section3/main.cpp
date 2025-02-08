@@ -26,14 +26,14 @@ VectorXi boundEMask;
 
 int main()
 {
-	cout << "BEGIN - Bunny" << endl;
+	cout << "BEGIN - Bunny -" << endl;
     readOFF(DATA_PATH "/Bunny.off",V, F);
     polyscope::init();
     polyscope::SurfaceMesh* pSurf = polyscope::registerSurfaceMesh("mesh", V, F);
     create_edge_list(F, H, E, boundEMask);
     
-    VectorXi B(2); B<<1000, 7642;
-    VectorXd xB(2); xB<<0.0, 1.0;
+    VectorXi B(2); B<<1000, 7642; // subset of vertex indices that represents the fixed vertices in the interpolation problem
+    VectorXd xB(2); xB<<0.0, 1.0; // values of the fixed vertices
     VectorXd x = harmonic_interpolation(V, E, B, xB);
     
     //Visualization
